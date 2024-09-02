@@ -4,4 +4,10 @@
 
 *{
     direction: rtl;
+    font-family: IRANSansWeb;
+}
+
+@font-face {
+    font-family: IRANSansWeb;
+    src: url("../font/IRANSansWeb.woff");
 }
