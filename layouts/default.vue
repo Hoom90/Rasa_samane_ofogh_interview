@@ -1,3 +1,12 @@
+<script setup>
+import headerComp from "./components/header.vue"
+import sidebarComp from "./components/sidebar.vue"
+</script>
+
 <template>
-    <router-view />
+    <UContainer>
+        <headerComp></headerComp>
+        <sidebarComp></sidebarComp>
+        <routerView />
+    </UContainer>
 </template>
