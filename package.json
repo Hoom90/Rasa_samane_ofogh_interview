@@ -11,11 +11,15 @@
   },
   "devDependencies": {
     "@nuxt/ui": "^2.18.4",
+    "@pinia/nuxt": "^0.5.4",
     "autoprefixer": "^10.4.20",
     "nuxt": "^3.9.0",
     "postcss": "^8.4.44",
     "tailwindcss": "^3.4.10",
     "vue": "^3.4.0",
     "vue-router": "^4.2.5"
+  },
+  "dependencies": {
+    "pinia": "^2.2.2"
   }
 }

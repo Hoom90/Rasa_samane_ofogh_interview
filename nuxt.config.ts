@@ -10,6 +10,17 @@ export default defineNuxtConfig({
     },
   },
 
-  modules: ["@nuxt/ui"],
+  modules: [
+    "@nuxt/ui",
+    '@pinia/nuxt',
+  ],
+
+  pinia: {
+    storesDirs: ['./stores/**',
+      'stores',
+      'stores/*/index.{ts,js,mjs,mts}',
+      'stores/**'],
+  },
+
   compatibilityDate: "2024-09-02"
 })
