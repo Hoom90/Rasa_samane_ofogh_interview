@@ -2,7 +2,22 @@
 export default defineNuxtConfig({
   devtools: { enabled: true },
   css: ['./assets/css/main.css'],
+  
+  app: {
+    head: {
+      title: 'رسا سامانه افق',
+      charset: 'utf-8',
+      meta: [],
+      link: [],
+    }
+  },
 
+  runtimeConfig: {
+    public: {
+      baseURL: process.env.BASE_URL,
+    },
+  },
+  
   postcss: {
     plugins: {
       tailwindcss: {},
@@ -13,6 +28,7 @@ export default defineNuxtConfig({
   modules: [
     "@nuxt/ui",
     '@pinia/nuxt',
+    // '@nuxtjs/axios',
   ],
 
   pinia: {
