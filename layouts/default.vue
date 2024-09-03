@@ -7,6 +7,8 @@ import sidebarComp from "./components/sidebar.vue"
     <UContainer>
         <headerComp></headerComp>
         <sidebarComp></sidebarComp>
-        <routerView />
+        <div class="mt-20">
+            <NuxtPage />
+        </div>
     </UContainer>
 </template>
