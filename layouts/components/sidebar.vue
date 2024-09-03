@@ -10,7 +10,7 @@ const links = [
 ]
 </script>
 <template>
-    <div v-if="memory.getSidebar" class="absolute top-0 right-0 bg-white text-black w-screen h-screen z-10">
+    <div v-if="memory.getSidebar" class="absolute top-0 right-0 bg-white text-black w-screen h-screen z-50">
         <div class="flex justify-center items-center h-full">
             <div class="grid gap-1 text-center">
                 <nuxtLink v-for="(item, index) in links" :key="index" :to="item.to"
@@ -25,8 +25,8 @@ const links = [
         </button>
     </div>
 
-    <div class="absolute top-[20%] right-0">
-        <button type="button" class="bg-white rounded-l-xl" @click="memory.setSidebar(true)">
+    <div class="absolute top-[20%] right-0 z-40">
+        <button type="button" class="bg-white rounded-l-xl shadow-xl" @click="memory.setSidebar(true)">
             <leftIconComp width="40" color="#aaa" />
         </button>
     </div>
