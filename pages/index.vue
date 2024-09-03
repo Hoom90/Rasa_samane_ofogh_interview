@@ -6,12 +6,12 @@ import image4 from "@/assets/image/image4.avif"
 import image5 from "@/assets/image/image5.avif"
 import { Swiper, SwiperSlide } from 'swiper/vue';
 import 'swiper/css';
-import 'swiper/css/effect-fade';
 import 'swiper/css/pagination';
 import 'swiper/css/navigation';
-import { EffectFade, Autoplay, Navigation } from 'swiper/modules';
+import { Autoplay, Navigation } from 'swiper/modules';
+const breadCrumb = appStore()
 const state = reactive({
-    modules: [EffectFade, Autoplay, Navigation],
+    modules: [Autoplay, Navigation],
     data: [
         { imageId: image1, title: image1 },
         { imageId: image2, title: image2 },
@@ -20,13 +20,19 @@ const state = reactive({
         { imageId: image5, title: image5 },
     ]
 })
+
+onMounted(() => {
+    breadCrumb.setBreadcrumbs([])
+    breadCrumb.setPageTitle(null)
+})
+
 </script>
 
 <template>
-    <swiper class="mt-3 rounded" :slidesPerView="1" effect="fade" :loop="true" :centeredSlides="true" :autoplay="{
+    <swiper class="rounded" :slidesPerView="1" :loop="true" :centeredSlides="true" :autoplay="{
         delay: 5000,
         disableOnInteraction: false,
-    }" :navigation="true" :modules="state.modules">
+    }" navigation :modules="state.modules">
         <swiper-slide v-for="item in state.data">
             <img :src="item.imageId" :alt="item.title" class="mx-auto" />
             <!-- <p class="slider-title" v-if="!item.link">{{ item.title }}</p>
