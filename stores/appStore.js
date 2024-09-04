@@ -5,8 +5,6 @@ export const appStore = defineStore("app", {
       pageIndex: 1,
       pageSize: 10,
       totalPages: 1,
-      hasNextPage: false,
-      hasPreviousPage: false,
     },
     pageTitle: null,
     breadCrumbs: [],
@@ -16,8 +14,6 @@ export const appStore = defineStore("app", {
     getPostPageIndex: (state) => state.postsPagination.pageIndex,
     getPostPageSize: (state) => state.postsPagination.pageSize,
     getPostTotalPages: (state) => state.postsPagination.totalPages,
-    getPostHasNextPage: (state) => state.postsPagination.hasNextPage,
-    getPostHasPreviousPage: (state) => state.postsPagination.hasPreviousPage,
     getPosts: (state) => state.posts,
     getBreadcrumbs: (state) => state.breadCrumbs,
     getPageTitle: (state) => state.pageTitle,
@@ -32,12 +28,6 @@ export const appStore = defineStore("app", {
     },
     setPostTotalPages(size) {
       this.postsPagination.totalPages = size;
-    },
-    setPostHasNextPage(condition) {
-      this.postsPagination.hasNextPage = condition;
-    },
-    setPostHasPreviousPage(condition) {
-      this.postsPagination.hasPreviousPage = condition;
     },
     setPosts(posts) {
       this.posts = posts;
