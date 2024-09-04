@@ -39,12 +39,15 @@ const state = reactive({
     selectedColumns: [],
     selected: [],
     search: null,
+
     isModal: false,
     isComment: false,
     isDelete: false,
     isMultiDelete: false,
+    isEdit: false,
     deleteModal: { id: null },
     commentModal: null,
+    editModal: null,
 })
 
 useHead({
@@ -107,9 +110,26 @@ const deleteMulti = async () => {
     state.isModal = false
 }
 
-// const rows = computed(() => {
-//     return store.getPosts.slice((state.pageIndex - 1) * state.pageSize, (state.pageIndex) * state.pageSize)
-// })
+const editPost = async () => {
+    await axiosApi().put(apiPath.putPost(state.editModal.id), state.editModal)
+        .then(res => {
+            // getData() بروزرسانی به وسیله سرور
+            // بروزرسانی سمت کاربر
+            let temp = state.posts.find(x => x.id == state.editModal.id)
+            temp.title = state.editModal.title
+            temp.body = state.editModal.body
+            store.setPosts(state.posts)
+            state.isModal = false
+        })
+        .catch(e => console.error(e))
+}
+
+const validate = () => {
+    const errors = []
+    if (!state.editModal.title) errors.push({ path: 'title', message: 'وارد کردن عنوان الزامی است' })
+    if (!state.editModal.body) errors.push({ path: 'body', message: 'وارد کردن متن الزامی است' })
+    return errors
+}
 
 const select = (row) => {
     const index = state.selectedRows.findIndex((item) => item.id === row.id)
@@ -140,6 +160,7 @@ const handleComments = (row) => {
     getComments()
     state.isModal = true // جهت نمایش مودال
     state.isDelete = false
+    state.isEdit = false
     state.isMultiDelete = false
     state.isComment = true // جهت نمایش نظرات ها
 }
@@ -152,6 +173,7 @@ const handleDelete = (row) => {
     state.isModal = true // جهت نمایش مودال
     state.isDelete = true // جهت نمایش حذف
     state.isMultiDelete = false
+    state.isEdit = false
     state.isComment = false
 }
 
@@ -159,10 +181,18 @@ const handleMultiDelete = () => {
     state.isModal = true // جهت نمایش مودال
     state.isMultiDelete = true // جهت نمایش حذف چندتایی
     state.isDelete = false
+    state.isEdit = false
     state.isComment = false
 }
 
-
+const handleEdit = (row) => {
+    state.editModal = { ...row }
+    state.isModal = true // جهت نمایش مودال
+    state.isMultiDelete = false
+    state.isDelete = false
+    state.isEdit = true // جهت نمایش ویرایش
+    state.isComment = false
+}
 </script>
 
 <template>
@@ -199,7 +229,7 @@ const handleMultiDelete = () => {
                 <UButton icon="i-heroicons-chat-bubble-oval-left" size="2xs" color="blue" variant="outline" square
                     @click="handleComments(row)" />
                 <UButton icon="i-heroicons-pencil" size="2xs" color="orange" variant="outline" square
-                    @click="$router.push(`/posts/edit/${row.id}`)" />
+                    @click="handleEdit(row)" />
                 <UButton icon="i-heroicons-trash" size="2xs" color="red" variant="outline" square
                     @click="handleDelete(row)" />
             </div>
@@ -211,6 +241,7 @@ const handleMultiDelete = () => {
     </div>
 
     <UModal v-model="state.isModal" class="dark:text-gray-100 " :ui="state.isComment ? { width: '' } : ''">
+
         <template v-if="state.isDelete">
             <UCard :ui="{ divide: 'divide-y divide-gray-100 dark:divide-gray-800' }">
                 <template #header>
@@ -230,6 +261,7 @@ const handleMultiDelete = () => {
                 </template>
             </UCard>
         </template>
+
         <template v-if="state.isComment">
             <UCard :ui="{ divide: 'divide-y divide-gray-100 dark:divide-gray-800' }" class="w-full">
                 <template #header>
@@ -250,6 +282,7 @@ const handleMultiDelete = () => {
                 </template>
             </UCard>
         </template>
+
         <template v-if="state.isMultiDelete">
             <UCard :ui="{ divide: 'divide-y divide-gray-100 dark:divide-gray-800' }">
                 <template #header>
@@ -268,6 +301,33 @@ const handleMultiDelete = () => {
                     </div>
                 </template>
             </UCard>
+        </template>
+
+        <template v-if="state.isEdit">
+            <UForm :validate="validate" @submit.prevent="editPost">
+                <UCard :ui="{ divide: 'divide-y divide-gray-100 dark:divide-gray-800' }">
+                    <template #header>
+                        <p class="text-orange-500">ویرایش پست</p>
+                    </template>
+
+                    <UFormGroup label="عنوان" name="title">
+                        <UInput v-model="state.editModal.title" variant="outline" placeholder="عنوان" />
+                    </UFormGroup>
+
+                    <UFormGroup label="متن" name="body">
+                        <UTextarea v-model="state.editModal.body" variant="outline" :rows="8" placeholder="متن" />
+                    </UFormGroup>
+
+                    <template #footer>
+                        <div class="grid grid-cols-2 gap-1">
+                            <UButton icon="i-heroicons-x-mark" label="انصراف" color="red" variant="solid"
+                                @click="state.isModal = false" block />
+                            <UButton icon="i-heroicons-check" label="تایید" color="blue" variant="solid" type="submit"
+                                block />
+                        </div>
+                    </template>
+                </UCard>
+            </UForm>
         </template>
     </UModal>
 </template>
