@@ -21,6 +21,12 @@ const state = reactive({
     ]
 })
 
+useHead({
+    title: 'صفحه اصلی',
+    meta: [{ name: 'description', content: 'این یک برنامه تستی میباشد' }],
+    meta: [{ name: 'keywords', content: 'کلیدواژه 1,کلیدواژه 2' }],
+})
+
 onMounted(() => {
     breadCrumb.setBreadcrumbs([])
     breadCrumb.setPageTitle(null)
@@ -35,8 +41,6 @@ onMounted(() => {
     }" navigation :modules="state.modules">
         <swiper-slide v-for="item in state.data">
             <img :src="item.imageId" :alt="item.title" class="mx-auto" />
-            <!-- <p class="slider-title" v-if="!item.link">{{ item.title }}</p>
-            <p class="slider-title" v-else><nuxt-link :to="item.link">{{ item.title }}</nuxt-link></p> -->
         </swiper-slide>
     </swiper>
 </template>
