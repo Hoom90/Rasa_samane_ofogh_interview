@@ -1,66 +1,273 @@
 <script setup>
-import postImg from "@/assets/image/post.avif"
 const store = appStore()
 const state = reactive({
     posts: [],
+    comments: [],
+    pageIndex: 1,
     pageSize: 10,
+    column: [{
+        key: 'id',
+        label: 'ردیف',
+        sortable: true,
+    }, {
+        key: 'title',
+        label: 'عنوان',
+        sortable: true
+    }, {
+        key: 'body',
+        label: 'متن',
+        sortable: true
+    }, {
+        key: 'actions',
+    }],
+    commentColumn: [{
+        key: 'id',
+        label: 'ردیف',
+    }, {
+        key: 'name',
+        label: 'نام ',
+    }, {
+        key: 'email',
+        label: 'ایمیل',
+    }],
+    dropdownActions: [[{
+        key: 'delete',
+        label: 'حذف کردن',
+        icon: 'i-heroicons-trash'
+    }]],
+    selectedRows: [],
+    selectedColumns: [],
+    selected: [],
+    search: null,
+    isModal: false,
+    isComment: false,
+    isDelete: false,
+    isMultiDelete: false,
+    deleteModal: { id: null },
+    commentModal: null,
+})
+
+useHead({
+    title: 'پست ها',
+    meta: [{ name: 'description', content: 'این صفحه برای تست API میباشد.' }],
+    meta: [{ name: 'keywords', content: 'کلیدواژه 1,کلیدواژه 2' }],
 })
 
 onBeforeMount(() => {
-    store.setBreadcrumbs([])
-    store.setPageTitle('پست ها')
+    store.setBreadcrumbs([]) // جهت عدم نمایش دکمه بازگشت در این صفحه
+    store.setPageTitle('پست ها') // نام صفحه
+    state.selectedColumns = [...state.column.filter(x => x.key != 'body')] // عدم نمایش قسمت Body از دیتایی که از سمت سرور میآید در جدول
     getData()
 })
 
 const getData = async () => {
     if (store.getPosts.length == 0) {
-        await axiosApi().get(apiPath.posts)
+        await axiosApi().get(apiPath.getAllPosts)
             .then(res => {
                 state.posts = res.data
                 store.setPosts(state.posts)
                 store.setPostPageIndex(1)
                 store.setPostPageSize(state.pageSize)
                 store.setPostTotalPages(state.posts.length / state.pageSize)
-                store.setPostHasNextPage(store.getPostTotalPages > 1 ? true : false)
-                store.setPostHasPreviousPage(store.getPostPageIndex == 1 ? false : true)
             })
             .catch(e => console.error(e))
     }
     else state.posts = store.getPosts
-    calculatePagination()
 }
 
-const calculatePagination = () => {
-    let initialAmount = store.getPostPageSize
-    if (store.getPostPageIndex == 1) initialAmount = 0
-    let startIndex = initialAmount * store.getPostPageIndex
-    let endIndex = startIndex + store.getPostPageSize
-    state.posts = state.posts.slice(startIndex, endIndex)
+const getComments = async () => {
+    await axiosApi().get(apiPath.getAllCommentsByPostId(state.commentModal.id))
+        .then(res => {
+            state.comments = res.data
+        }).catch(e => console.error(e))
 }
 
-const changePagination = (index) => {
-    if (index == store.getPostPageIndex) return
-    else {
-        store.setPostPageIndex(index)
-        state.posts = store.getPosts
-        calculatePagination()
+const deletePost = async () => {
+    await axiosApi().delete(apiPath.deletePost(state.deleteModal.id)).
+        then(res => {
+            // getData() بروزرسانی به وسیله سرور
+            state.posts = state.posts.filter(x => x.id != state.deleteModal.id) // بروزرسانی سمت کاربر
+            store.setPosts(state.posts)
+            state.isModal = false
+        })
+        .catch(e => console.error(e))
+}
+
+const deleteMulti = async () => {
+    for (let item of state.selectedRows) {
+        state.deleteModal.id = item.id
+        await axiosApi().delete(apiPath.deletePost(state.deleteModal.id)).
+            then(res => {
+                // getData() بروزرسانی به وسیله سرور
+                state.posts = state.posts.filter(x => x.id != state.deleteModal.id) // بروزرسانی سمت کاربر
+                store.setPosts(state.posts)
+            })
+            .catch(e => console.error(e))
+    }
+    state.isModal = false
+}
+
+// const rows = computed(() => {
+//     return store.getPosts.slice((state.pageIndex - 1) * state.pageSize, (state.pageIndex) * state.pageSize)
+// })
+
+const select = (row) => {
+    const index = state.selectedRows.findIndex((item) => item.id === row.id)
+    if (index === -1) {
+        state.selectedRows.push(row)
+    } else {
+        state.selectedRows.splice(index, 1)
     }
 }
+
+const filteredRows = computed(() => {
+    if (!state.search) {
+        return state.posts.slice((state.pageIndex - 1) * state.pageSize, (state.pageIndex) * state.pageSize)
+    }
+
+    return state.posts.filter(x => {
+        return Object.values(x).some((value) => {
+            return String(value).toLowerCase().includes(state.search.toLowerCase())
+        })
+    })
+})
+
+const handleComments = (row) => {
+    state.commentModal = {
+        id: row.id,
+        title: row.title
+    } // اطلاعات قابل نمایش برای مودال
+    getComments()
+    state.isModal = true // جهت نمایش مودال
+    state.isDelete = false
+    state.isMultiDelete = false
+    state.isComment = true // جهت نمایش نظرات ها
+}
+
+const handleDelete = (row) => {
+    state.deleteModal = {
+        id: row.id,
+        title: row.title
+    } // اطلاعات قابل نمایش برای مودال
+    state.isModal = true // جهت نمایش مودال
+    state.isDelete = true // جهت نمایش حذف
+    state.isMultiDelete = false
+    state.isComment = false
+}
+
+const handleMultiDelete = () => {
+    state.isModal = true // جهت نمایش مودال
+    state.isMultiDelete = true // جهت نمایش حذف چندتایی
+    state.isDelete = false
+    state.isComment = false
+}
+
 
 </script>
 
 <template>
-    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-1">
-        <div v-for="(post, index) in state.posts" :key="index" class="bg-gray-100 rounded overflow-hidden shadow">
-            <img :src="postImg" alt="" class="w-full aspect-square object-cover">
-            <p class="p-3">{{ post.title }}</p>
+    <div class="flex justify-between gap-1">
+        <div class="flex gap-1">
+            <UButton icon="i-heroicons-plus" color="gray" size="xs" @click="$router.push('/posts/add')">
+                افزودن پست جدید
+            </UButton>
+            <UInput v-model="state.search" icon="i-heroicons-magnifying-glass-20-solid" size="xs" placeholder="جستجو..." />
+        </div>
+
+        <div class="flex gap-1">
+            <UButton v-if="state.selectedRows.length > 1" icon="i-heroicons-trash" :trailing="false" color="gray" size="xs"
+                @click="handleMultiDelete">
+                حذف کردن
+            </UButton>
+            <!-- <UDropdown :items="state.dropdownActions" :ui="{ width: 'w-36' }">
+            </UDropdown> -->
+            <USelectMenu v-model="state.selectedColumns" :options="state.column" multiple>
+                <UButton icon="i-heroicons-view-columns" color="gray" size="xs">
+                    نام ستون
+                </UButton>
+            </USelectMenu>
+            <UButton icon="i-heroicons-funnel" color="gray" size="xs"
+                :disabled="state.search === '' && state.selectedStatus.length === 0" @click="resetFilters">
+                حذف فیلتر
+            </UButton>
         </div>
     </div>
 
-    <div class="flex justify-center items-center gap-1 my-3 mb-20">
-        <button v-for="(item, index) in store.getPostTotalPages" @click="changePagination(index + 1)"
-            class="p-1 border shadow w-full aspect-square"
-            :class="index + 1 == store.getPostPageIndex ? 'bg-blue-500 text-white' : ''">{{ index + 1
-            }}</button>
+    <UTable v-model="state.selectedRows" @select="select" :columns="state.selectedColumns" :rows="filteredRows">
+        <template #actions-data="{ row }">
+            <div class="flex gap-1">
+                <UButton icon="i-heroicons-chat-bubble-oval-left" size="2xs" color="blue" variant="outline" square
+                    @click="handleComments(row)" />
+                <UButton icon="i-heroicons-pencil" size="2xs" color="orange" variant="outline" square
+                    @click="$router.push(`/posts/edit/${row.id}`)" />
+                <UButton icon="i-heroicons-trash" size="2xs" color="red" variant="outline" square
+                    @click="handleDelete(row)" />
+            </div>
+        </template>
+    </UTable>
+
+    <div v-if="!state.search" class="flex justify-center px-3 py-3 border-t border-gray-200 dark:border-gray-700">
+        <UPagination v-model="state.pageIndex" :page-count="state.pageSize" :total="state.posts.length" />
     </div>
+
+    <UModal v-model="state.isModal" class="dark:text-gray-100 " :ui="state.isComment ? { width: '' } : ''">
+        <template v-if="state.isDelete">
+            <UCard :ui="{ divide: 'divide-y divide-gray-100 dark:divide-gray-800' }">
+                <template #header>
+                    <p class="text-red-500">{{ `حذف پست` }}</p>
+                </template>
+
+                <p>{{ `آیا از حذف پست ${state.deleteModal.title} مطمئن هستید؟` }}</p>
+                <p>این عملیات قابل بازگشت نیست!</p>
+
+                <template #footer>
+                    <div class="grid grid-cols-2 gap-1">
+                        <UButton icon="i-heroicons-x-mark" label="انصراف" color="red" variant="solid"
+                            @click="state.isModal = false" block />
+                        <UButton icon="i-heroicons-check" label="تایید" color="blue" variant="solid" @click="deletePost"
+                            block />
+                    </div>
+                </template>
+            </UCard>
+        </template>
+        <template v-if="state.isComment">
+            <UCard :ui="{ divide: 'divide-y divide-gray-100 dark:divide-gray-800' }" class="w-full">
+                <template #header>
+                    <p>نظرات پست</p>
+                    <p>{{ state.commentModal.title }}</p>
+                </template>
+
+                <UTable :columns="state.commentColumn" :rows="state.comments">
+                    <template #expand="{ row }">
+                        <div class="p-4 max-w-[500px]">
+                            <p class="text-wrap">{{ row.body }}</p>
+                        </div>
+                    </template>
+                </UTable>
+
+                <template #footer>
+                    <Placeholder class="h-8" />
+                </template>
+            </UCard>
+        </template>
+        <template v-if="state.isMultiDelete">
+            <UCard :ui="{ divide: 'divide-y divide-gray-100 dark:divide-gray-800' }">
+                <template #header>
+                    <p class="text-red-500">حذف چندتایی پست</p>
+                </template>
+
+                <p>آیا از حذف پست های انتخاب شده مطمئن هستید؟</p>
+                <p>این عملیات قابل بازگشت نیست!</p>
+
+                <template #footer>
+                    <div class="grid grid-cols-2 gap-1">
+                        <UButton icon="i-heroicons-x-mark" label="انصراف" color="red" variant="solid"
+                            @click="state.isModal = false" block />
+                        <UButton icon="i-heroicons-check" label="تایید" color="blue" variant="solid" @click="deleteMulti"
+                            block />
+                    </div>
+                </template>
+            </UCard>
+        </template>
+    </UModal>
 </template>
