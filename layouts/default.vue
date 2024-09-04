@@ -4,10 +4,10 @@ import sidebarComp from "./components/sidebar.vue"
 </script>
 
 <template>
-    <UContainer>
+    <UContainer class="dark:bg-gray-950">
         <headerComp></headerComp>
         <sidebarComp></sidebarComp>
-        <div class="mt-20">
+        <div class="mt-16 pt-5 min-h-[calc(100vh-64px)]">
             <NuxtPage />
         </div>
     </UContainer>
