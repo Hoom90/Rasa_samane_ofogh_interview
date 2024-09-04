@@ -3,7 +3,6 @@
 @tailwind utilities;
 
 *{
-    direction: rtl;
     font-family: IRANSansWeb;
 }
 
