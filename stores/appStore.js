@@ -9,6 +9,7 @@ export const appStore = defineStore("app", {
     pageTitle: null,
     breadCrumbs: [],
     sidebar: false,
+    addNewPostIndex: 101,
   }),
   getters: {
     getPostPageIndex: (state) => state.postsPagination.pageIndex,
@@ -18,6 +19,7 @@ export const appStore = defineStore("app", {
     getBreadcrumbs: (state) => state.breadCrumbs,
     getPageTitle: (state) => state.pageTitle,
     getSidebar: (state) => state.sidebar,
+    getAddNewPostIndex: (state) => state.addNewPostIndex,
   },
   actions: {
     setPostPageIndex(index) {
@@ -40,6 +42,9 @@ export const appStore = defineStore("app", {
     },
     setSidebar(sidebar) {
       this.sidebar = sidebar;
+    },
+    setAddNewPostIndex(index) {
+      this.addNewPostIndex = index;
     },
   },
 });
