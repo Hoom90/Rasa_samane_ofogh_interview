@@ -14,5 +14,8 @@ const store = appStore()
             <hr class="p-1" v-if="store.getBreadcrumbs.length != 0" />
             <NuxtPage />
         </UContainer>
+
+        <UNotifications />
+
     </div>
 </template>

@@ -1,4 +1,5 @@
 <script setup>
+const toast = useToast()
 const store = appStore()
 const state = reactive({
     posts: [],
@@ -79,7 +80,7 @@ const getData = async () => {
                 store.setPostPageSize(state.pageSize)
                 store.setPostTotalPages(state.posts.length / state.pageSize)
             })
-            .catch(e => console.error(e))
+            .catch(e => toast.add({ title: e, color: "red" }))
     }
     else state.posts = store.getPosts
 }
@@ -88,7 +89,7 @@ const getComments = async () => {
     await axiosApi().get(apiPath.getAllCommentsByPostId(state.commentModal.id))
         .then(res => {
             state.comments = res.data
-        }).catch(e => console.error(e))
+        }).catch(e => toast.add({ title: e, color: "red" }))
 }
 
 const deletePost = async () => {
@@ -98,8 +99,9 @@ const deletePost = async () => {
             state.posts = state.posts.filter(x => x.id != state.deleteModal.id) // بروزرسانی سمت کاربر
             store.setPosts(state.posts)
             state.isModal = false
+            toast.add({ title: 'عمیات موفق', color: "green" })
         })
-        .catch(e => console.error(e))
+        .catch(e => toast.add({ title: e, color: "red" }))
 }
 
 const deleteMulti = async () => {
@@ -111,9 +113,13 @@ const deleteMulti = async () => {
                 state.posts = state.posts.filter(x => x.id != state.deleteModal.id) // بروزرسانی سمت کاربر
                 store.setPosts(state.posts)
             })
-            .catch(e => console.error(e))
+            .catch(e => {
+                toast.add({ title: e, color: "red" })
+                return
+            })
     }
     state.isModal = false
+    toast.add({ title: 'عمیات موفق', color: "green" })
 }
 
 const editPost = async () => {
@@ -126,8 +132,9 @@ const editPost = async () => {
             temp.body = state.editModal.body
             store.setPosts(state.posts)
             state.isModal = false
+            toast.add({ title: 'عمیات موفق', color: "green" })
         })
-        .catch(e => console.error(e))
+        .catch(e => toast.add({ title: e, color: "red" }))
 }
 
 const validate = () => {

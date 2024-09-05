@@ -1,4 +1,5 @@
 <script setup>
+const toast = useToast()
 const store = appStore()
 const state = reactive({
     posts: null,
@@ -34,8 +35,9 @@ const addPost = async () => {
             store.setAddNewPostIndex(store.getAddNewPostIndex + 1)
             state.post.title = null
             state.post.body = null
+            toast.add({ title: 'عمیات موفق', color: "green" })
         })
-        .catch(e => console.error(e))
+        .catch(e => toast.add({ title: e, color: "red" }))
 }
 
 const validate = () => {
