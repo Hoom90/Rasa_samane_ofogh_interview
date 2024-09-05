@@ -57,9 +57,15 @@ useHead({
 })
 
 onBeforeMount(() => {
-    store.setBreadcrumbs([]) // جهت عدم نمایش دکمه بازگشت در این صفحه
+    // نمایش 
+    // breadcrumb 
+    // در این صفحه
+    store.setBreadcrumbs([{ label: 'صفحه اصلی', to: '/' }, { label: 'پست ها', to: '/posts' }])
     store.setPageTitle('پست ها') // نام صفحه
-    state.selectedColumns = [...state.column.filter(x => x.key != 'body')] // عدم نمایش قسمت Body از دیتایی که از سمت سرور میآید در جدول
+    // عدم نمایش
+    // Body 
+    // از دیتایی که از سرور میآید در جدول
+    state.selectedColumns = [...state.column.filter(x => x.key != 'body')]
     getData()
 })
 
