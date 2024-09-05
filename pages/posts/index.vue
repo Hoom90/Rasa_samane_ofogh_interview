@@ -60,7 +60,7 @@ onBeforeMount(() => {
     // نمایش 
     // breadcrumb 
     // در این صفحه
-    store.setBreadcrumbs([{ label: 'صفحه اصلی', to: '/' }, { label: 'پست ها', to: '/posts' }])
+    store.setBreadcrumbs([{ label: 'صفحه اصلی', to: '/' }, { label: 'پست ها' }])
     store.setPageTitle('پست ها') // نام صفحه
     // عدم نمایش
     // Body 
@@ -158,6 +158,11 @@ const filteredRows = computed(() => {
     })
 })
 
+const resetFilters = () => {
+    state.search = null
+    state.selectedColumns = []
+}
+
 const handleComments = (row) => {
     state.commentModal = {
         id: row.id,
@@ -223,7 +228,7 @@ const handleEdit = (row) => {
                 </UButton>
             </USelectMenu>
             <UButton icon="i-heroicons-funnel" color="gray" size="xs"
-                :disabled="state.search === '' && state.selectedStatus.length === 0" @click="resetFilters">
+                :disabled="state.search === '' && state.selectedColumns.length === 0" @click="resetFilters">
                 حذف فیلتر
             </UButton>
         </div>
@@ -316,11 +321,11 @@ const handleEdit = (row) => {
                         <p class="text-orange-500">ویرایش پست</p>
                     </template>
 
-                    <UFormGroup label="عنوان" name="title">
+                    <UFormGroup label="عنوان*" name="title">
                         <UInput v-model="state.editModal.title" variant="outline" placeholder="عنوان" />
                     </UFormGroup>
 
-                    <UFormGroup label="متن" name="body">
+                    <UFormGroup label="متن*" name="body">
                         <UTextarea v-model="state.editModal.body" variant="outline" :rows="8" placeholder="متن" />
                     </UFormGroup>
 
