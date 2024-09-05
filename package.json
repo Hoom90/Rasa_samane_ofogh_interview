@@ -21,7 +21,9 @@
   },
   "dependencies": {
     "@nuxtjs/axios": "^5.13.6",
+    "chart.js": "^4.4.4",
     "pinia": "^2.2.2",
-    "swiper": "^11.1.12"
+    "swiper": "^11.1.12",
+    "vue-chartjs": "^5.3.1"
   }
 }
