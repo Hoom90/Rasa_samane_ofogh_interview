@@ -1,21 +1,22 @@
 <script setup>
 import logoComp from "@/assets/components/logo.vue"
-import rightIconComp from "@/assets/components/right.vue"
-const breadcrumb = appStore()
+const store = appStore()
 </script>
 <template>
     <div class="fixed top-0 left-0 w-full z-50">
-        <div class="p-3 bg-white dark:bg-red-700 dark:text-white shadow" @scroll="">
-            <div class="grid items-center text-center" :class="breadcrumb.getPageTitle ? 'grid-cols-3' : 'grid-cols-1'">
-                <div v-if="breadcrumb.getPageTitle">
-                    <rightIconComp v-if="breadcrumb.getBreadcrumbs.length != 0" width="40" color="currentColor" />
+        <div class="p-3 bg-white dark:bg-gray-900 dark:text-white shadow" @scroll="">
+            <div class="grid items-center text-center grid-cols-3">
+                <div class="text-start">
+                    <UButton size="xl" icon="i-heroicons-bars-3" @click="store.setSidebar(!store.getSidebar)" />
                 </div>
-                <div v-if="breadcrumb.getPageTitle">
-                    {{ breadcrumb.getPageTitle }}
+                <div v-if="store.getPageTitle">
+                    {{ store.getPageTitle }}
                 </div>
-                <div class="flex items-center" :class="!breadcrumb.getPageTitle ? 'justify-center' : 'justify-end'">
-                    <logoComp size="40" />
-                    <span v-if="!breadcrumb.getPageTitle">رسا سامانه افق</span>
+                <div class="flex items-center" :class="!store.getPageTitle ? 'justify-center' : 'justify-end'">
+                    <UButton variant="text" size="" to="/">
+                        <logoComp size="40" />
+                        <span v-if="!store.getPageTitle">رسا سامانه افق</span>
+                    </UButton>
                 </div>
             </div>
         </div>

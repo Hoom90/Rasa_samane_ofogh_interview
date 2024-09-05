@@ -1,41 +1,28 @@
 <script setup>
-import closeIconComp from "@/assets/components/close.vue"
-import leftIconComp from "@/assets/components/left.vue"
 const router = useRouter()
-const memory = appStore()
+const store = appStore()
 const links = [
-    { title: 'صفحه اصلی', to: '/' },
-    { title: 'پست ها', to: '/posts' },
-    { title: 'پست جدید', to: '/posts/add' },
-    { title: 'آمار بازدید', to: '/visitState' },
+    { title: 'صفحه اصلی', to: '/', icon: 'i-heroicons-home' },
+    { title: 'پست ها', to: '/posts', icon: 'i-heroicons-inbox' },
+    { title: 'پست جدید', to: '/posts/add', icon: 'i-heroicons-inbox-arrow-down' },
+    { title: 'آمار بازدید', to: '/visitState', icon: 'i-heroicons-chart-pie' },
 ]
 
 const handleRouting = (link) => {
     router.push(link)
-    memory.setSidebar(false)
+    store.setSidebar(false)
 }
 
 </script>
 <template>
-    <div v-if="memory.getSidebar"
-        class="fixed top-0 right-0 bg-white dark:bg-gray-950 dark:text-white w-screen h-screen z-50">
-        <div class="flex justify-center items-center h-full">
-            <div class="flex flex-wrap justify-center gap-1">
-                <button type="button" v-for="(item, index) in links" :key="index" @click="handleRouting(item.to)"
-                    class="border bg-white border-red-700 dark:bg-red-700 rounded p-3 px-6 w-[200px]">
-                    {{ item.title }}
-                </button>
+    <div class="sticky top-0 right-0 h-screen z-40 transition-all border-l"
+        :class="store.getSidebar ? 'w-[70px]' : 'w-[200px]'">
+        <div class="mt-16 bg-white dark:bg-gray-950 dark:text-white">
+            <div class="grid gap-1 p-3">
+                <UButton size="xl" block v-for="(item, index) in links" :key="index" :icon="item.icon"
+                    :label="store.getSidebar ? '' : item.title" @click="handleRouting(item.to)">
+                </UButton>
             </div>
         </div>
-
-        <button type="button" class="absolute top-5 left-5 cursor-pointer" @click="memory.setSidebar(false)">
-            <closeIconComp :width="40" color="currentColor" />
-        </button>
-    </div>
-
-    <div class="fixed top-[20%] right-0 z-40">
-        <button type="button" class="bg-red-700 text-white rounded-l-xl shadow-xl" @click="memory.setSidebar(true)">
-            <leftIconComp width="40" color="currentColor" />
-        </button>
     </div>
 </template>
